@@ -55,8 +55,7 @@ class ViewController: UIViewController {
         modulus.layer.cornerRadius = CGFloat(Raduis)
         sign.layer.cornerRadius = CGFloat(Raduis)
         Ac.layer.cornerRadius = CGFloat(Raduis)
-        zero.layer.cornerRadius = 30
-        
+        zero.layer.cornerRadius = CGFloat(Raduis)
     }
     var input: Int = 0
     var firstNumber: Int = 0
@@ -65,6 +64,10 @@ class ViewController: UIViewController {
     var count: Int = 0
     var operation: Character = " "
     var firstOrSecond: Bool = true
+    var sheckDouble: Bool = false
+    var doubleInput: Double = 0
+    var doubleFirstInput: Double = 0
+    var doubleSecondInput: Double = 0
     
     func appendDigit (digit: Int){
         if count < 5 {
@@ -136,14 +139,35 @@ class ViewController: UIViewController {
         firstOrSecond = false
     }
     
-    
+    @IBAction func signClicked(_ sender: UIButton) {
+        input = input - 2 * input
+        if firstOrSecond {
+              firstNumber = input
+              screen.text = String(firstNumber)
+        }else{
+              secondNumber = input
+              screen.text = String(firstNumber) + " " + String(operation) + " " + String(secondNumber)
+        }
+    }
     @IBAction func modulus(_ sender: UIButton) {
         operation = "%"
         screen.text = String(input) + " % "
         input = 0
         firstOrSecond = false
     }
-    
+    @IBAction func decimalClicked(_ sender: UIButton) {
+        sheckDouble = true
+        
+        if firstOrSecond {
+              doubleInput = Double(input)
+              
+              screen.text = String(firstNumber) + ","
+        }else{
+              input = -input
+              secondNumber = input
+              screen.text = String(firstNumber) + " " + String(operation) + " " + String(secondNumber)
+        }
+    }
     
     @IBAction func equalClicked(_ sender: UIButton) {
         switch operation {
