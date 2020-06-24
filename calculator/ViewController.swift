@@ -10,6 +10,8 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    //MARK: - Outlets -
+    
     @IBOutlet weak var zero: UIButton!
     @IBOutlet weak var one: UIButton!
     @IBOutlet weak var two: UIButton!
@@ -30,12 +32,38 @@ class ViewController: UIViewController {
     @IBOutlet weak var sign: UIButton!
     @IBOutlet weak var Ac: UIButton!
     @IBOutlet weak var screen: UILabel!
+    //MARK: - Properties -
     
-    var Raduis: Int = 40
+    var Raduis: CGFloat = 40.0
+    var input: Int = 0
+    var firstNumber: Int = 0
+    var secondNumber: Int = 0
+    var result: Int = 0
+    var count: Int = 0
+    var operation: Character = " "
+    var firstOrSecond: Bool = true
+    var checkDouble: Bool = false
+    var checkDoubleFirstNumber: Bool = false
+    var checkDoubleSecondNumber: Bool = false
+    var doubleInput: Double = 0
+    var doubleFirstNumber: Double = 0
+    var doubleSecondNumber: Double = 0
+    var checkEqual = false
+    var checkOperation = false
+    var checkFirst = false
+    var checkSecond = false
+    
+    //MARK: - Life cycle -
     override func viewDidLoad() {
         
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        screen.adjustsFontSizeToFitWidth = true
+    }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        Raduis = zero.frame.height / 2.0
         
         fraction.layer.cornerRadius = CGFloat(Raduis)
         equal.layer.cornerRadius = CGFloat(Raduis)
@@ -56,28 +84,10 @@ class ViewController: UIViewController {
         sign.layer.cornerRadius = CGFloat(Raduis)
         Ac.layer.cornerRadius = CGFloat(Raduis)
         zero.layer.cornerRadius = CGFloat(Raduis)
-        
-        screen.adjustsFontSizeToFitWidth = true
     }
-    var input: Int = 0
-    var firstNumber: Int = 0
-    var secondNumber: Int = 0
-    var result: Int = 0
-    var count: Int = 0
-    var operation: Character = " "
-    var firstOrSecond: Bool = true
-    var checkDouble: Bool = false
-    var checkDoubleFirstNumber: Bool = false
-    var checkDoubleSecondNumber: Bool = false
-    var doubleInput: Double = 0
-    var doubleFirstNumber: Double = 0
-    var doubleSecondNumber: Double = 0
-    var checkEqual = false
-    var checkOperation = false
-    var checkFirst = false
-    var checkSecond = false
     
     
+    //MARK: - Actions -
     @IBAction func zeroClicked(_ sender: UIButton) {
         if checkDouble {
             appendDigitAfterPoint(digit: 0)
@@ -148,46 +158,9 @@ class ViewController: UIViewController {
             appendDigit(digit: 9)
         }
     }
-    func appendDigit (digit: Int){
-        if firstNumber != 0 || secondNumber != 0 {
-            count += 1
-        }
-        if count < 5 {
-            if firstOrSecond {
-                firstNumber = firstNumber * 10 + digit
-                screen.text = String(firstNumber)
-                checkFirst = true
-            }else{
-                checkOperation = true
-                secondNumber = secondNumber * 10 + digit
-                if checkDoubleFirstNumber{
-                    screen.text = String(doubleFirstNumber) + " " + String(operation) + " " + String(secondNumber)
-                    checkSecond = true
-                }else{
-                    screen.text = String(firstNumber) + " " + String(operation) + " " + String(secondNumber)
-                    checkSecond = true
-                }
-            }
-        }
-    }
-    func appendDigitAfterPoint (digit: Int){
-        if count < 5 {
-            doubleInput = doubleInput + ( Double(digit)  / pow( 10.0 , Double(count - 1)))
-            count += 1
-        }
-        if firstOrSecond {
-            doubleFirstNumber = doubleInput
-            screen.text = String(doubleFirstNumber)
-        }else if checkDoubleFirstNumber{
-            doubleSecondNumber = doubleInput
-            screen.text = String(doubleFirstNumber) + " " + String(operation) + " " + String(doubleSecondNumber)
-        }else{
-            doubleSecondNumber = doubleInput
-            screen.text = String(firstNumber) + " " + String(operation) + " " + String(doubleSecondNumber)
-        }
-    }
+    
     @IBAction func plusClicked(_ sender: UIButton) {
-        if !checkOperation {
+        if !checkOperation && checkFirst{
         operation = "+"
         if checkDouble {
             screen.text = String(doubleInput) + " + "
@@ -196,12 +169,11 @@ class ViewController: UIViewController {
         }
         firstOrSecond = false
         count = 0
-        checkDouble = false
         }
         
     }
     @IBAction func minusClicked(_ sender: UIButton) {
-        if !checkOperation {
+        if !checkOperation && checkFirst{
         operation = "-"
         if checkDouble {
             screen.text = String(doubleInput) + " - "
@@ -210,12 +182,11 @@ class ViewController: UIViewController {
         }
         firstOrSecond = false
         count = 0
-        checkDouble = false
         }
         
     }
     @IBAction func multiplyClicked(_ sender: UIButton) {
-        if !checkOperation {
+        if !checkOperation && checkFirst{
         operation = "*"
         if checkDouble {
             screen.text = String(doubleInput) + " * "
@@ -224,11 +195,10 @@ class ViewController: UIViewController {
         }
         firstOrSecond = false
         count = 0
-        checkDouble = false
         }
     }
     @IBAction func divideClicked(_ sender: UIButton) {
-        if !checkOperation {
+        if !checkOperation && checkFirst{
         operation = "/"
         if checkDouble {
             screen.text = String(doubleInput) + " / "
@@ -237,7 +207,18 @@ class ViewController: UIViewController {
         }
         firstOrSecond = false
         count = 0
-        checkDouble = false
+        }
+    }
+    @IBAction func modulus(_ sender: UIButton) {
+        if !checkOperation && checkFirst{
+            operation = "%"
+        if checkDouble {
+            screen.text = String(doubleInput) + " % "
+        }else{
+            screen.text = String(firstNumber) + " % "
+        }
+        firstOrSecond = false
+        count = 0
         }
     }
     @IBAction func signClicked(_ sender: UIButton) {
@@ -255,29 +236,16 @@ class ViewController: UIViewController {
             screen.text = String(doubleFirstNumber)
         }
         else{
-          input = input - 2 * input
           if firstOrSecond {
-              firstNumber = input
+              firstNumber = firstNumber - 2 * firstNumber
               screen.text = String(firstNumber)
           }else{
-              secondNumber = input
+              secondNumber = secondNumber - 2 * secondNumber
               screen.text = String(firstNumber) + " " + String(operation) + " " + String(secondNumber)
           }
         }
     }
-    @IBAction func modulus(_ sender: UIButton) {
-        if !checkOperation {
-            operation = "%"
-        if checkDouble {
-            screen.text = String(doubleInput) + " % "
-        }else{
-            screen.text = String(firstNumber) + " % "
-        }
-        firstOrSecond = false
-        count = 0
-        checkDouble = false
-        }
-    }
+    
     @IBAction func fractionClicked(_ sender: UIButton) {
         checkDouble = true
         count = 2
@@ -323,8 +291,11 @@ class ViewController: UIViewController {
                 screen.text = "can't divide by zero"
             }else if operation == "%"{
                 screen.text = "can't modulus with float numbers"
+            }else if doubleInput == 0{
+                 screen.text = String(doubleFirstNumber) + " " + String(operation) + " " + String(doubleSecondNumber) + " = 0"
             }
             else{
+                doubleInput = Double(Int(doubleInput * pow( 10.0 , Double(count - 1)))) / pow( 10.0 , Double(count - 1))
                 screen.text = String(doubleFirstNumber) + " " + String(operation) + " " + String(doubleSecondNumber) + " = "+String(doubleInput)
             }
             
@@ -348,6 +319,7 @@ class ViewController: UIViewController {
             }else if operation == "%"{
                 screen.text = "can't modulus with float numbers"
             }else{
+                doubleInput = Double(Int(doubleInput * pow( 10.0 , Double(count - 1)))) / pow( 10.0 , Double(count - 1))
                 screen.text = String(firstNumber) + " " + String(operation) + " " + String(doubleSecondNumber) + " = "+String(doubleInput)
             }
         }else if checkDoubleFirstNumber && !checkDouble {
@@ -370,6 +342,7 @@ class ViewController: UIViewController {
             }else if operation == "%"{
                 screen.text = "can't modulus with float numbers"
             }else{
+                doubleInput = Double(Int(doubleInput * pow( 10.0 , Double(count - 1)))) / pow( 10.0 , Double(count - 1))
                 screen.text = String(doubleFirstNumber) + " " + String(operation) + " " + String(secondNumber) + " = "+String(doubleInput)
             }
         }
@@ -426,6 +399,48 @@ class ViewController: UIViewController {
          checkDoubleFirstNumber = false
          checkDoubleSecondNumber = false
     }
+    //MARK: - Appends Functions -
+    func appendDigit (digit: Int){
+        if firstNumber != 0 || secondNumber != 0 {
+            count += 1
+        }
+        if count < 5 {
+            if firstOrSecond {
+                firstNumber = firstNumber * 10 + digit
+                screen.text = String(firstNumber)
+                checkFirst = true
+            }else{
+                checkDouble = false
+                checkOperation = true
+                secondNumber = secondNumber * 10 + digit
+                if checkDoubleFirstNumber{
+                    screen.text = String(doubleFirstNumber) + " " + String(operation) + " " + String(secondNumber)
+                    checkSecond = true
+                }else{
+                    screen.text = String(firstNumber) + " " + String(operation) + " " + String(secondNumber)
+                    checkSecond = true
+                }
+            }
+        }
+    }
+    func appendDigitAfterPoint (digit: Int){
+        if count < 5 {
+            doubleInput = doubleInput + ( Double(digit)  / pow( 10.0 , Double(count - 1)))
+            doubleInput = Double(Int(doubleInput * pow( 10.0 , Double(count - 1)))) / pow( 10.0 , Double(count - 1))
+            count += 1
+        }
+        if firstOrSecond {
+            doubleFirstNumber = doubleInput
+            screen.text = String(doubleFirstNumber)
+        }else if checkDoubleFirstNumber{
+            doubleSecondNumber = doubleInput
+            screen.text = String(doubleFirstNumber) + " " + String(operation) + " " + String(doubleSecondNumber)
+        }else{
+            doubleSecondNumber = doubleInput
+            screen.text = String(firstNumber) + " " + String(operation) + " " + String(doubleSecondNumber)
+        }
+    }
+    
     
 }
 
